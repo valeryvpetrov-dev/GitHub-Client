@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GeekBrains.Android.Level-3</string>
+    <string name="load_button_text">Load user</string>
+    <string name="username_edit_hint">Username</string>
 </resources>

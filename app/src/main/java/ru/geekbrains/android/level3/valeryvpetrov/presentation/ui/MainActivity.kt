@@ -1,0 +1,57 @@
+package ru.geekbrains.android.level3.valeryvpetrov.presentation.ui
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import ru.geekbrains.android.level3.valeryvpetrov.Application
+import ru.geekbrains.android.level3.valeryvpetrov.R
+import ru.geekbrains.android.level3.valeryvpetrov.databinding.ActivityMainBinding
+import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.MainViewModel
+import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.ViewModelFactory
+import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: MainViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.lifecycleOwner = this
+
+        viewModel = ViewModelProviders.of(
+            this,
+            ViewModelFactory.getInstance(
+                ConnectivityManager(application),
+                (application as Application).appExecutors,
+                (application as Application).retrofitGithub
+            )
+        )
+            .get(MainViewModel::class.java)
+        binding.viewModel = viewModel
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadError.observe(this, Observer {
+            binding.responseText.text = it.message
+        })
+        viewModel.users.observe(this, Observer {
+            if (it.isEmpty()) return@Observer
+
+            val stringBuilder = StringBuilder()
+            for (user in it) {
+                stringBuilder.append(
+                    "\nLogin = " + user.login +
+                            "\nId = " + user.id +
+                            "\n-----------------"
+                )
+            }
+            binding.responseText.text = stringBuilder.toString()
+        })
+    }
+}
+
