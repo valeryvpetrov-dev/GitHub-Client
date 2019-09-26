@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUsersUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.UseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.UseCaseHandler
@@ -12,11 +14,16 @@ import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 class MainViewModel(
     private val connectivityManager: ConnectivityManager,
     private val useCaseHandler: UseCaseHandler,
-    private val getUsersUseCase: GetUsersUseCase
+    private val getUsersUseCase: GetUsersUseCase,
+    private val getUserUseCase: GetUserUseCase
 ) : ViewModel() {
 
-    private val _users = MutableLiveData<List<User>>().apply { value = emptyList() }
-    val users: LiveData<List<User>>
+    private val _user = MutableLiveData<User>()
+    val user: LiveData<User>
+        get() = _user
+
+    private val _users = MutableLiveData<List<UserItem>>().apply { value = emptyList() }
+    val users: LiveData<List<UserItem>>
         get() = _users
 
     private val _loadError = MutableLiveData<Throwable>()
@@ -27,20 +34,25 @@ class MainViewModel(
     val dataLoading: LiveData<Boolean>
         get() = _dataLoading
 
-    fun loadUsers() {
+    fun loadUser(username: String) {
+        if (username.trim().isEmpty()) {
+            _loadError.value = Throwable("Pass valid username")
+            return
+        }
+
         _dataLoading.value = true
 
         if (connectivityManager.isNetworkConnected()) {
-            useCaseHandler.execute(getUsersUseCase,
-                GetUsersUseCase.RequestValue(),
-                object : UseCase.Callback<GetUsersUseCase.ResponseValue, GetUsersUseCase.Error> {
+            useCaseHandler.execute(getUserUseCase,
+                GetUserUseCase.RequestValue(username),
+                object : UseCase.Callback<GetUserUseCase.ResponseValue, GetUserUseCase.Error> {
 
-                    override fun onSuccess(response: GetUsersUseCase.ResponseValue) {
+                    override fun onSuccess(response: GetUserUseCase.ResponseValue) {
                         _dataLoading.value = false
-                        _users.postValue(response.users)
+                        _user.postValue(response.user)
                     }
 
-                    override fun onError(error: GetUsersUseCase.Error) {
+                    override fun onError(error: GetUserUseCase.Error) {
                         _dataLoading.value = false
                         _loadError.postValue(error.throwable)
                     }

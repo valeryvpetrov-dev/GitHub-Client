@@ -32,7 +32,7 @@
                     android:id="@+id/loadButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:onClick="@{() -> viewModel.loadUsers()}"
+                    android:onClick="@{() -> viewModel.loadUser(usernameEdit.getText().toString())}"
                     android:text="@string/load_button_text" />
 
             <ProgressBar

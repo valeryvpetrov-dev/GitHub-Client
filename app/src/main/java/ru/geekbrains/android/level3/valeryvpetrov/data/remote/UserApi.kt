@@ -1,10 +1,10 @@
-package ru.geekbrains.android.level3.valeryvpetrov.data.network.remote
+package ru.geekbrains.android.level3.valeryvpetrov.data.remote
 
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
-import ru.geekbrains.android.level3.valeryvpetrov.data.network.remote.entity.UserItemResponse
-import ru.geekbrains.android.level3.valeryvpetrov.data.network.remote.entity.UserResponse
+import ru.geekbrains.android.level3.valeryvpetrov.data.remote.entity.UserItemResponse
+import ru.geekbrains.android.level3.valeryvpetrov.data.remote.entity.UserResponse
 
 interface UserApi {
 

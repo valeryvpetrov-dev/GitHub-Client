@@ -1,8 +1,8 @@
-package ru.geekbrains.android.level3.valeryvpetrov.data.network.remote
+package ru.geekbrains.android.level3.valeryvpetrov.data.remote
 
 import androidx.annotation.WorkerThread
 import retrofit2.Retrofit
-import ru.geekbrains.android.level3.valeryvpetrov.data.network.remote.entity.mapToDomain
+import ru.geekbrains.android.level3.valeryvpetrov.data.remote.entity.mapToDomain
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.util.AppExecutors
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository

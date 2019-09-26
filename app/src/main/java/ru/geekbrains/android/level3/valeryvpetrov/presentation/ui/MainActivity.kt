@@ -39,18 +39,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.loadError.observe(this, Observer {
             binding.responseText.text = it.message
         })
-        viewModel.users.observe(this, Observer {
-            if (it.isEmpty()) return@Observer
-
-            val stringBuilder = StringBuilder()
-            for (user in it) {
-                stringBuilder.append(
-                    "\nLogin = " + user.login +
-                            "\nId = " + user.id +
-                            "\n-----------------"
-                )
-            }
-            binding.responseText.text = stringBuilder.toString()
+        viewModel.user.observe(this, Observer {
+            binding.responseText.text = it.toString()
         })
     }
 }

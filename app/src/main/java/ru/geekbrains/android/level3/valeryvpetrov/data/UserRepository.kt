@@ -1,7 +1,7 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data
 
-import androidx.annotation.WorkerThread
-import ru.geekbrains.android.level3.valeryvpetrov.data.network.remote.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
 
 class UserRepository(
@@ -16,8 +16,14 @@ class UserRepository(
             instance ?: UserRepository(userRemoteRepository).apply { instance = this }
     }
 
-    @WorkerThread
     override fun getUsers(callback: DomainUserRepository.GetUsersCallback) {
         return userRemoteRepository.getUsers(callback)
+    }
+
+    override fun getUser(
+        requestValue: GetUserUseCase.RequestValue,
+        callback: DomainUserRepository.GetUserCallback
+    ) {
+        return userRemoteRepository.getUser(requestValue, callback)
     }
 }
