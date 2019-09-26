@@ -32,15 +32,16 @@ class MainActivity : AppCompatActivity() {
         )
             .get(MainViewModel::class.java)
         binding.viewModel = viewModel
-    }
 
-    override fun onResume() {
-        super.onResume()
         viewModel.loadError.observe(this, Observer {
             binding.responseText.text = it.message
         })
         viewModel.user.observe(this, Observer {
             binding.responseText.text = it.toString()
+        })
+        viewModel.userRepos.observe(this, Observer {
+            binding.responseText.text = "${binding.responseText.text}" +
+                    "\n\nUser repositories: \n$it"
         })
     }
 }

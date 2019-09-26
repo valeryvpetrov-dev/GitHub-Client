@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import retrofit2.Retrofit
 import ru.geekbrains.android.level3.valeryvpetrov.data.UserRepository
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserReposUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUsersUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.UseCaseHandler
@@ -15,7 +16,8 @@ class ViewModelFactory(
     private val connectivityManager: ConnectivityManager,
     private val useCaseHandler: UseCaseHandler,
     private val getUsersUseCase: GetUsersUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val getUserReposUseCase: GetUserReposUseCase
 ) : ViewModelProvider.NewInstanceFactory() {
 
     companion object {
@@ -35,7 +37,8 @@ class ViewModelFactory(
                     connectivityManager,
                     UseCaseHandler.getInstance(appExecutors),
                     GetUsersUseCase(userRepository),
-                    GetUserUseCase(userRepository)
+                    GetUserUseCase(userRepository),
+                    GetUserReposUseCase(userRepository)
                 )
             }
             return instance as ViewModelFactory
@@ -50,7 +53,8 @@ class ViewModelFactory(
                         connectivityManager,
                         useCaseHandler,
                         getUsersUseCase,
-                        getUserUseCase
+                        getUserUseCase,
+                        getUserReposUseCase
                     )
                 else ->
                     throw IllegalArgumentException("Unknown ViewModel class $modelClass")

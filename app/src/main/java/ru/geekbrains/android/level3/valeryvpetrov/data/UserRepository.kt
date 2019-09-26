@@ -1,6 +1,7 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data
 
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserReposUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
 
@@ -25,5 +26,12 @@ class UserRepository(
         callback: DomainUserRepository.GetUserCallback
     ) {
         return userRemoteRepository.getUser(requestValue, callback)
+    }
+
+    override fun getUserRepos(
+        requestValue: GetUserReposUseCase.RequestValue,
+        callback: DomainUserRepository.GetUserReposCallback
+    ) {
+        return userRemoteRepository.getUserRepos(requestValue, callback)
     }
 }

@@ -3,20 +3,23 @@ package ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUsersUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.UseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.UseCaseHandler
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.*
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 
 class MainViewModel(
     private val connectivityManager: ConnectivityManager,
     private val useCaseHandler: UseCaseHandler,
     private val getUsersUseCase: GetUsersUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val getUserReposUseCase: GetUserReposUseCase
 ) : ViewModel() {
+
+    private val _userRepos = MutableLiveData<List<RepoItem>>()
+    val userRepos: LiveData<List<RepoItem>>
+        get() = _userRepos
 
     private val _user = MutableLiveData<User>()
     val user: LiveData<User>
@@ -34,7 +37,7 @@ class MainViewModel(
     val dataLoading: LiveData<Boolean>
         get() = _dataLoading
 
-    fun loadUser(username: String) {
+    fun loadUserWithRepos(username: String) {
         if (username.trim().isEmpty()) {
             _loadError.value = Throwable("Pass valid username")
             return
@@ -48,13 +51,27 @@ class MainViewModel(
                 object : UseCase.Callback<GetUserUseCase.ResponseValue, GetUserUseCase.Error> {
 
                     override fun onSuccess(response: GetUserUseCase.ResponseValue) {
-                        _dataLoading.value = false
-                        _user.postValue(response.user)
+                        _user.value = response.user
+
+                        useCaseHandler.execute(getUserReposUseCase,
+                            GetUserReposUseCase.RequestValue(response.user),
+                            object :
+                                UseCase.Callback<GetUserReposUseCase.ResponseValue, GetUserReposUseCase.Error> {
+                                override fun onSuccess(response: GetUserReposUseCase.ResponseValue) {
+                                    _dataLoading.value = false
+                                    _userRepos.value = response.repoItems
+                                }
+
+                                override fun onError(error: GetUserReposUseCase.Error) {
+                                    _dataLoading.value = false
+                                    _loadError.value = error.throwable
+                                }
+                            })
                     }
 
                     override fun onError(error: GetUserUseCase.Error) {
                         _dataLoading.value = false
-                        _loadError.postValue(error.throwable)
+                        _loadError.value = error.throwable
                     }
                 })
         } else {
