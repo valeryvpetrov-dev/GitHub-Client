@@ -1,7 +1,6 @@
-package ru.geekbrains.android.level3.valeryvpetrov.domain.entity
+package ru.geekbrains.android.level3.valeryvpetrov.presentation.entity
 
 data class User(
-    val id: Int,
     val login: String,
     val name: String?,
     val company: String?,
