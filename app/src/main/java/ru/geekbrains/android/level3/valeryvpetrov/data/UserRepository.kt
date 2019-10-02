@@ -1,8 +1,10 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data
 
+import io.reactivex.Single
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteRepository
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserReposUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
 
 class UserRepository(
@@ -17,21 +19,15 @@ class UserRepository(
             instance ?: UserRepository(userRemoteRepository).apply { instance = this }
     }
 
-    override fun getUsers(callback: DomainUserRepository.GetUsersCallback) {
-        return userRemoteRepository.getUsers(callback)
+    override fun getUsers(): Single<List<UserItem>> {
+        return userRemoteRepository.getUsers()
     }
 
-    override fun getUser(
-        requestValue: GetUserUseCase.RequestValue,
-        callback: DomainUserRepository.GetUserCallback
-    ) {
-        return userRemoteRepository.getUser(requestValue, callback)
+    override fun getUser(username: String): Single<User> {
+        return userRemoteRepository.getUser(username)
     }
 
-    override fun getUserRepos(
-        requestValue: GetUserReposUseCase.RequestValue,
-        callback: DomainUserRepository.GetUserReposCallback
-    ) {
-        return userRemoteRepository.getUserRepos(requestValue, callback)
+    override fun getUserRepos(username: String): Single<List<RepoItem>> {
+        return userRemoteRepository.getUserRepos(username)
     }
 }

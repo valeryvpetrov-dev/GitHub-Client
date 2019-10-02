@@ -1,37 +1,22 @@
 package ru.geekbrains.android.level3.valeryvpetrov.domain.usecase
 
-import androidx.annotation.WorkerThread
+import io.reactivex.Single
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
+import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IExecutionScheduler
+import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IPostExecutionScheduler
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository
 
 class GetUserReposUseCase(
+    executionScheduler: IExecutionScheduler,
+    postExecutionScheduler: IPostExecutionScheduler,
     private val userRepository: UserRepository
-) : UseCase<GetUserReposUseCase.RequestValue, GetUserReposUseCase.ResponseValue, GetUserReposUseCase.Error>() {
+) : UseCase<String, List<RepoItem>>(
+    executionScheduler,
+    postExecutionScheduler
+) {
 
-    class RequestValue(
-        val user: User
-    ) : UseCase.RequestValue {}
-
-    class ResponseValue(
-        val repoItems: List<RepoItem>
-    ) : UseCase.ResponseValue {}
-
-    class Error(
-        val throwable: Throwable
-    ) : UseCase.Error {}
-
-    @WorkerThread
-    override fun execute(requestValue: RequestValue) {
-        userRepository.getUserRepos(requestValue, object : UserRepository.GetUserReposCallback {
-
-            override fun onSuccess(repoItems: List<RepoItem>) {
-                callback.onSuccess(ResponseValue(repoItems))
-            }
-
-            override fun onError(throwable: Throwable) {
-                callback.onError(Error(throwable))
-            }
-        })
+    override fun buildSingle(requestValue: String): Single<List<RepoItem>> {
+        return userRepository.getUserRepos(requestValue)
     }
 }

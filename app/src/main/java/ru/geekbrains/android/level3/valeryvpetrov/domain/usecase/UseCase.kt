@@ -1,29 +1,28 @@
 package ru.geekbrains.android.level3.valeryvpetrov.domain.usecase
 
-import androidx.annotation.MainThread
-import androidx.annotation.WorkerThread
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IExecutionScheduler
+import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IPostExecutionScheduler
 
-abstract class UseCase<Q : UseCase.RequestValue, R : UseCase.ResponseValue, E : UseCase.Error>() {
+abstract class UseCase<Q, R>(
+    protected val executionScheduler: IExecutionScheduler,
+    protected val postExecutionScheduler: IPostExecutionScheduler
+) {
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    lateinit var requestValue: Q
+    protected abstract fun buildSingle(requestValue: Q): Single<R>
 
-    lateinit var callback: Callback<R, E>
-
-    interface RequestValue {}
-
-    interface ResponseValue {}
-
-    interface Error {}
-
-    interface Callback<R, E> {
-
-        @MainThread
-        fun onSuccess(response: R)
-
-        @MainThread
-        fun onError(error: E)
+    fun execute(requestValue: Q, singleObserver: DisposableSingleObserver<R>) {
+        val observable = buildSingle(requestValue)
+            .subscribeOn(executionScheduler.getScheduler())
+            .observeOn(postExecutionScheduler.getScheduler())
+        compositeDisposable.add(observable.subscribeWith(singleObserver))
     }
 
-    @WorkerThread
-    abstract fun execute(requestValue: Q)
+    fun dispose() {
+        if (!compositeDisposable.isDisposed)
+            compositeDisposable.dispose()
+    }
 }

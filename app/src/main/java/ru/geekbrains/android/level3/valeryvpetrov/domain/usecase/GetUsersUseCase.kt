@@ -1,34 +1,21 @@
 package ru.geekbrains.android.level3.valeryvpetrov.domain.usecase
 
-import androidx.annotation.WorkerThread
+import io.reactivex.Single
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
+import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IExecutionScheduler
+import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IPostExecutionScheduler
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository
 
 class GetUsersUseCase(
+    executionScheduler: IExecutionScheduler,
+    postExecutionScheduler: IPostExecutionScheduler,
     private val userRepository: UserRepository
-) : UseCase<GetUsersUseCase.RequestValue, GetUsersUseCase.ResponseValue, GetUsersUseCase.Error>() {
+) : UseCase<Unit, List<UserItem>>(
+    executionScheduler,
+    postExecutionScheduler
+) {
 
-    class RequestValue : UseCase.RequestValue {}
-
-    class ResponseValue(
-        val userItems: List<UserItem>
-    ) : UseCase.ResponseValue {}
-
-    class Error(
-        val throwable: Throwable
-    ) : UseCase.Error {}
-
-    @WorkerThread
-    override fun execute(requestValue: RequestValue) {
-        userRepository.getUsers(object : UserRepository.GetUsersCallback {
-
-            override fun onSuccess(userItems: List<UserItem>) {
-                callback.onSuccess(ResponseValue(userItems))
-            }
-
-            override fun onError(throwable: Throwable) {
-                callback.onError(Error(throwable))
-            }
-        })
+    override fun buildSingle(requestValue: Unit): Single<List<UserItem>> {
+        return userRepository.getUsers()
     }
 }

@@ -8,13 +8,11 @@ import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteReposito
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserReposUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUsersUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.UseCaseHandler
 import ru.geekbrains.android.level3.valeryvpetrov.util.AppExecutors
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 
 class ViewModelFactory(
     private val connectivityManager: ConnectivityManager,
-    private val useCaseHandler: UseCaseHandler,
     private val getUsersUseCase: GetUsersUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val getUserReposUseCase: GetUserReposUseCase
@@ -29,16 +27,29 @@ class ViewModelFactory(
             appExecutors: AppExecutors,
             retrofitGithub: Retrofit
         ): ViewModelFactory {
-            val userRemoteRepository = UserRemoteRepository(appExecutors, retrofitGithub)
+            val userRemoteRepository = UserRemoteRepository(retrofitGithub)
             val userRepository = UserRepository.getInstance(userRemoteRepository)
+            val networkExecutionScheduler = appExecutors.networkIo
+            val mainThreadExecutionScheduler = appExecutors.mainThread
 
             if (instance == null) {
                 instance = ViewModelFactory(
                     connectivityManager,
-                    UseCaseHandler.getInstance(appExecutors),
-                    GetUsersUseCase(userRepository),
-                    GetUserUseCase(userRepository),
-                    GetUserReposUseCase(userRepository)
+                    GetUsersUseCase(
+                        networkExecutionScheduler,
+                        mainThreadExecutionScheduler,
+                        userRepository
+                    ),
+                    GetUserUseCase(
+                        networkExecutionScheduler,
+                        mainThreadExecutionScheduler,
+                        userRepository
+                    ),
+                    GetUserReposUseCase(
+                        networkExecutionScheduler,
+                        mainThreadExecutionScheduler,
+                        userRepository
+                    )
                 )
             }
             return instance as ViewModelFactory
@@ -51,7 +62,6 @@ class ViewModelFactory(
                 isAssignableFrom(MainViewModel::class.java) ->
                     MainViewModel(
                         connectivityManager,
-                        useCaseHandler,
                         getUsersUseCase,
                         getUserUseCase,
                         getUserReposUseCase

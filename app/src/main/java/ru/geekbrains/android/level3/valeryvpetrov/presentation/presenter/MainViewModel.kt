@@ -3,15 +3,17 @@ package ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.reactivex.observers.DisposableSingleObserver
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.*
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserReposUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUsersUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 
 class MainViewModel(
     private val connectivityManager: ConnectivityManager,
-    private val useCaseHandler: UseCaseHandler,
     private val getUsersUseCase: GetUsersUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val getUserReposUseCase: GetUserReposUseCase
@@ -46,37 +48,23 @@ class MainViewModel(
         _dataLoading.value = true
 
         if (connectivityManager.isNetworkConnected()) {
-            useCaseHandler.execute(getUserUseCase,
-                GetUserUseCase.RequestValue(username),
-                object : UseCase.Callback<GetUserUseCase.ResponseValue, GetUserUseCase.Error> {
-
-                    override fun onSuccess(response: GetUserUseCase.ResponseValue) {
-                        _user.value = response.user
-
-                        useCaseHandler.execute(getUserReposUseCase,
-                            GetUserReposUseCase.RequestValue(response.user),
-                            object :
-                                UseCase.Callback<GetUserReposUseCase.ResponseValue, GetUserReposUseCase.Error> {
-                                override fun onSuccess(response: GetUserReposUseCase.ResponseValue) {
-                                    _dataLoading.value = false
-                                    _userRepos.value = response.repoItems
-                                }
-
-                                override fun onError(error: GetUserReposUseCase.Error) {
-                                    _dataLoading.value = false
-                                    _loadError.value = error.throwable
-                                }
-                            })
-                    }
-
-                    override fun onError(error: GetUserUseCase.Error) {
-                        _dataLoading.value = false
-                        _loadError.value = error.throwable
-                    }
-                })
+            getUserReposUseCase.execute(username, UserReposUseCaseSingleObserver())
         } else {
             _dataLoading.value = false
             _loadError.value = Throwable("No internet connection")
+        }
+    }
+
+    inner class UserReposUseCaseSingleObserver : DisposableSingleObserver<List<RepoItem>>() {
+
+        override fun onSuccess(repoItems: List<RepoItem>) {
+            _dataLoading.value = false
+            _userRepos.value = repoItems
+        }
+
+        override fun onError(e: Throwable) {
+            _dataLoading.value = false
+            _loadError.value = e
         }
     }
 }
