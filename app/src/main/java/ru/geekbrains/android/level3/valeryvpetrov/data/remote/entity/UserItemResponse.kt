@@ -37,7 +37,3 @@ data class UserItemResponse(
     @SerializedName("url")
     val url: String
 )
-
-fun UserItemResponse.mapToDomain(): UserItem {
-    return UserItem(this.login, this.id)
-}

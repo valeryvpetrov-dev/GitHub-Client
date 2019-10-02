@@ -1,7 +1,6 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data.remote.entity
 
 import com.google.gson.annotations.SerializedName
-import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 
 data class RepoItemResponse(
     @SerializedName("id")
@@ -149,7 +148,3 @@ data class RepoItemResponse(
     @SerializedName("default_branch")
     val defaultBranch: String
 )
-
-fun RepoItemResponse.mapToDomain(): RepoItem {
-    return RepoItem(this.id, this.fullName, this.description ?: "No description")
-}

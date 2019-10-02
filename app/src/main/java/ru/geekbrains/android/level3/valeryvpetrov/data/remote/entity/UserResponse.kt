@@ -68,16 +68,3 @@ data class UserResponse(
     @SerializedName("url")
     val url: String
 )
-
-fun UserResponse.mapToDomain(): User {
-    return User(
-        this.login,
-        this.id,
-        this.name,
-        this.company ?: "No company",
-        this.blog,
-        this.location,
-        this.email ?: "No email",
-        this.bio
-    )
-}

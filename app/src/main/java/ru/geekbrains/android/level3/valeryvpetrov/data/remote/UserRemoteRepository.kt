@@ -2,7 +2,7 @@ package ru.geekbrains.android.level3.valeryvpetrov.data.remote
 
 import io.reactivex.Single
 import retrofit2.Retrofit
-import ru.geekbrains.android.level3.valeryvpetrov.data.remote.entity.mapToDomain
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
