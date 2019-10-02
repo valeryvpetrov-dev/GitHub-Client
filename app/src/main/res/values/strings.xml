@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">GeekBrains.Android.Level-3</string>
-    <string name="load_button_text">Load user</string>
+
     <string name="username_edit_hint">Username</string>
+
+    <string name="load_network_button_text">Load from network</string>
+    <string name="load_db_button_text">Load from DB</string>
+    <string name="save_db_button_text">Save to DB</string>
+    <string name="delete_db_button_text">Delete from DB</string>
+    <string name="action_show_logs_title">Show logs</string>
 </resources>

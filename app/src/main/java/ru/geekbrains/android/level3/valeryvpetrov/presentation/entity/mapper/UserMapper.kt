@@ -11,6 +11,7 @@ fun DomainUser.mapToPresentation(): User {
         this.blog,
         this.location,
         this.email,
-        this.bio
+        this.bio,
+        this.repoItems?.map { it.mapToPresentation() }
     )
 }

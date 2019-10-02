@@ -15,10 +15,10 @@ abstract class UseCase<Q, R>(
     protected abstract fun buildSingle(requestValue: Q): Single<R>
 
     fun execute(requestValue: Q, singleObserver: DisposableSingleObserver<R>) {
-        val observable = buildSingle(requestValue)
+        val single = buildSingle(requestValue)
             .subscribeOn(executionScheduler.getScheduler())
             .observeOn(postExecutionScheduler.getScheduler())
-        compositeDisposable.add(observable.subscribeWith(singleObserver))
+        compositeDisposable.add(single.subscribeWith(singleObserver))
     }
 
     fun dispose() {

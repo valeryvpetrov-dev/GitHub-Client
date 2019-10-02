@@ -1,51 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <import type="android.view.View" />
 
         <variable
                 name="viewModel"
                 type="ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.MainViewModel" />
     </data>
 
-    <ScrollView
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             tools:context=".presentation.ui.MainActivity">
 
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                style="@style/AppTheme.AppBarOverlay">
 
-            <EditText
-                    android:id="@+id/usernameEdit"
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:hint="@string/username_edit_hint" />
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-            <Button
-                    android:id="@+id/loadButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="@{() -> viewModel.loadUserWithRepos(usernameEdit.getText().toString())}"
-                    android:text="@string/load_button_text" />
-
-            <ProgressBar
-                    android:id="@+id/loadProgress"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="@{viewModel.dataLoading.booleanValue() ? View.VISIBLE : View.GONE}" />
-
-            <TextView
-                    android:id="@+id/responseText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
+        <include
+                android:id="@+id/activity_main_content"
+                layout="@layout/activity_main_content"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:viewModel="@{viewModel}" />
+    </LinearLayout>
 </layout>

@@ -9,11 +9,8 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
 interface UserRepository {
 
     @WorkerThread
-    fun getUsers(): Single<List<UserItem>>
-
-    @WorkerThread
     fun getUser(username: String): Single<User>
 
     @WorkerThread
-    fun getUserRepos(username: String): Single<List<RepoItem>>
+    fun getUserRepos(user: User): Single<List<RepoItem>>
 }

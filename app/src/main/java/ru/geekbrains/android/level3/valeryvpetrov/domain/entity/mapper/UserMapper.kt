@@ -12,6 +12,7 @@ fun UserResponse.mapToDomain(): DomainUser {
         this.blog,
         this.location,
         this.email,
-        this.bio
+        this.bio,
+        null
     )
 }

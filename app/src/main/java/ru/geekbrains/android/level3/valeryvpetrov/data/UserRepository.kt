@@ -1,10 +1,9 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data
 
 import io.reactivex.Single
-import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteRepository
+import io.reactivex.functions.Function
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
-import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
 
 class UserRepository(
@@ -15,19 +14,28 @@ class UserRepository(
 
         private var instance: UserRepository? = null
 
-        fun getInstance(userRemoteRepository: UserRemoteRepository) =
+        fun getInstance(userRemoteRepository: DomainUserRepository) =
             instance ?: UserRepository(userRemoteRepository).apply { instance = this }
-    }
-
-    override fun getUsers(): Single<List<UserItem>> {
-        return userRemoteRepository.getUsers()
     }
 
     override fun getUser(username: String): Single<User> {
         return userRemoteRepository.getUser(username)
+            .doOnError {
+                Throwable("Problem with getting user")
+            }
+            .flatMap(Function<User, Single<User>> { user ->
+                return@Function getUserRepos(user)
+                    .map {
+                        user.repoItems = it
+                        return@map user
+                    }
+            })
     }
 
-    override fun getUserRepos(username: String): Single<List<RepoItem>> {
-        return userRemoteRepository.getUserRepos(username)
+    override fun getUserRepos(user: User): Single<List<RepoItem>> {
+        return userRemoteRepository.getUserRepos(user)
+            .doOnError {
+                Throwable("Problem with getting user repos")
+            }
     }
 }

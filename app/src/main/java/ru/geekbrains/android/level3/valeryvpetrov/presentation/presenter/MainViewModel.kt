@@ -4,32 +4,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.observers.DisposableSingleObserver
-import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
-import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
-import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.UserItem
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserReposUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUsersUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.RepoItem
+import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.User
+import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.mapper.mapToPresentation
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
+import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User as DomainUser
 
 class MainViewModel(
     private val connectivityManager: ConnectivityManager,
-    private val getUsersUseCase: GetUsersUseCase,
-    private val getUserUseCase: GetUserUseCase,
-    private val getUserReposUseCase: GetUserReposUseCase
+    private val getUserUseCase: GetUserUseCase
 ) : ViewModel() {
-
-    private val _userRepos = MutableLiveData<List<RepoItem>>()
-    val userRepos: LiveData<List<RepoItem>>
-        get() = _userRepos
 
     private val _user = MutableLiveData<User>()
     val user: LiveData<User>
         get() = _user
-
-    private val _users = MutableLiveData<List<UserItem>>().apply { value = emptyList() }
-    val users: LiveData<List<UserItem>>
-        get() = _users
 
     private val _loadError = MutableLiveData<Throwable>()
     val loadError: LiveData<Throwable>
@@ -39,7 +28,7 @@ class MainViewModel(
     val dataLoading: LiveData<Boolean>
         get() = _dataLoading
 
-    fun loadUserWithRepos(username: String) {
+    fun loadUserWithReposFromNetwork(username: String) {
         if (username.trim().isEmpty()) {
             _loadError.value = Throwable("Pass valid username")
             return
@@ -48,18 +37,38 @@ class MainViewModel(
         _dataLoading.value = true
 
         if (connectivityManager.isNetworkConnected()) {
-            getUserReposUseCase.execute(username, UserReposUseCaseSingleObserver())
+            getUserUseCase.execute(username, GetUserUseCaseSingleObserver())
         } else {
             _dataLoading.value = false
             _loadError.value = Throwable("No internet connection")
         }
     }
 
-    inner class UserReposUseCaseSingleObserver : DisposableSingleObserver<List<RepoItem>>() {
+    fun loadUserWithReposFromDb(username: String) {
+        if (username.trim().isEmpty()) {
+            _loadError.value = Throwable("Pass valid username")
+            return
+        }
 
-        override fun onSuccess(repoItems: List<RepoItem>) {
+        _dataLoading.value = true
+        TODO()
+    }
+
+    fun saveUserWithReposToDb(user: User?) {
+        if (user == null) return
+        TODO()
+    }
+
+    fun deleteUserWithReposFromDb(user: User?) {
+        if (user == null) return
+        TODO()
+    }
+
+    inner class GetUserUseCaseSingleObserver : DisposableSingleObserver<DomainUser>() {
+
+        override fun onSuccess(user: DomainUser) {
             _dataLoading.value = false
-            _userRepos.value = repoItems
+            _user.value = user.mapToPresentation()
         }
 
         override fun onError(e: Throwable) {

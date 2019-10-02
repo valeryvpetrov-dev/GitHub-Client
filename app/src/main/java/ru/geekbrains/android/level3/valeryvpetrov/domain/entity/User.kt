@@ -8,5 +8,6 @@ data class User(
     val blog: String?,
     val location: String?,
     val email: String?,
-    val bio: String?
+    val bio: String?,
+    var repoItems: List<RepoItem>?
 )
