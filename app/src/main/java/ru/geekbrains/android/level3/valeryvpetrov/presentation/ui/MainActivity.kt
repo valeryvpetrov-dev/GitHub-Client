@@ -3,7 +3,6 @@ package ru.geekbrains.android.level3.valeryvpetrov.presentation.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -17,6 +16,7 @@ import ru.geekbrains.android.level3.valeryvpetrov.databinding.ActivityMainBindin
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.MainViewModel
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.ViewModelFactory
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
+import ru.geekbrains.android.level3.valeryvpetrov.util.toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,12 +49,40 @@ class MainActivity : AppCompatActivity() {
         userRepoItemsRecycler.adapter = repoItemsAdapter
         userRepoItemsRecycler.setHasFixedSize(true)
 
+        setObservers()
+    }
+
+    private fun setObservers() {
         viewModel.loadError.observe(this, Observer {
-            Toast.makeText(this, it.message, Toast.LENGTH_LONG)
-                .show()
+            toast(it.message ?: "Load error")
         })
         viewModel.user.observe(this, Observer { user ->
-            user.repoItems?.let { it -> repoItemsAdapter.setItems(it) }
+            if (user == null) {
+                repoItemsAdapter.clear()
+            } else {
+                user.repoItems?.let { it -> repoItemsAdapter.setItems(it) }
+            }
+        })
+        viewModel.saveUserResult.observe(this, Observer { (result, error) ->
+            if (result != null) {
+                if (result)
+                    toast("User has been saved successfully")
+                else
+                    toast("User has not been saved")
+            }
+            if (error != null) {
+                toast(error.message ?: "Save user result error")
+            }
+        })
+        viewModel.deleteUserResult.observe(this, Observer { (result, error) ->
+            if (result != null) {
+                if (result)
+                    toast("User has been delete successfully")
+                else
+                    toast("User has not been deleted")
+            }
+            if (error != null)
+                toast(error.message ?: "Delete user result error")
         })
     }
 

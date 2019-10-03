@@ -3,15 +3,20 @@ package ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import retrofit2.Retrofit
-import ru.geekbrains.android.level3.valeryvpetrov.data.UserRepository
-import ru.geekbrains.android.level3.valeryvpetrov.data.remote.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.data.local.repository.UserLocalRepository
+import ru.geekbrains.android.level3.valeryvpetrov.data.remote.repository.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.data.repository.UserRepository
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.DeleteUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.SaveUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.util.AppExecutors
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 
 class ViewModelFactory(
     private val connectivityManager: ConnectivityManager,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val saveUserUseCase: SaveUserUseCase,
+    private val deleteUserUseCase: DeleteUserUseCase
 ) : ViewModelProvider.NewInstanceFactory() {
 
     companion object {
@@ -23,9 +28,14 @@ class ViewModelFactory(
             appExecutors: AppExecutors,
             retrofitGithub: Retrofit
         ): ViewModelFactory {
-            val userRemoteRepository = UserRemoteRepository(retrofitGithub)
-            val userRepository = UserRepository.getInstance(userRemoteRepository)
+            val userRemoteRepository =
+                UserRemoteRepository(
+                    retrofitGithub
+                )
+            val userLocalRetrofit = UserLocalRepository()
+            val userRepository = UserRepository.getInstance(userRemoteRepository, userLocalRetrofit)
             val networkExecutionScheduler = appExecutors.networkIo
+            val diskExecutionScheduler = appExecutors.diskIo
             val mainThreadExecutionScheduler = appExecutors.mainThread
 
             if (instance == null) {
@@ -33,6 +43,16 @@ class ViewModelFactory(
                     connectivityManager,
                     GetUserUseCase(
                         networkExecutionScheduler,
+                        mainThreadExecutionScheduler,
+                        userRepository
+                    ),
+                    SaveUserUseCase(
+                        diskExecutionScheduler,
+                        mainThreadExecutionScheduler,
+                        userRepository
+                    ),
+                    DeleteUserUseCase(
+                        diskExecutionScheduler,
                         mainThreadExecutionScheduler,
                         userRepository
                     )
@@ -48,7 +68,9 @@ class ViewModelFactory(
                 isAssignableFrom(MainViewModel::class.java) ->
                     MainViewModel(
                         connectivityManager,
-                        getUserUseCase
+                        getUserUseCase,
+                        saveUserUseCase,
+                        deleteUserUseCase
                     )
                 else ->
                     throw IllegalArgumentException("Unknown ViewModel class $modelClass")

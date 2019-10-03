@@ -31,6 +31,11 @@ class RepoItemsAdapter(
         notifyDataSetChanged()
     }
 
+    fun clear() {
+        this.repoItems = listOf()
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(
         val binding: ItemRepoBinding
     ) : RecyclerView.ViewHolder(binding.root)

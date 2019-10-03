@@ -5,6 +5,7 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User as DomainUs
 
 fun DomainUser.mapToPresentation(): User {
     return User(
+        this.id,
         this.login,
         this.name,
         this.company,

@@ -1,4 +1,4 @@
-package ru.geekbrains.android.level3.valeryvpetrov.data.remote.entity
+package ru.geekbrains.android.level3.valeryvpetrov.data.remote.github.entity
 
 import com.google.gson.annotations.SerializedName
 

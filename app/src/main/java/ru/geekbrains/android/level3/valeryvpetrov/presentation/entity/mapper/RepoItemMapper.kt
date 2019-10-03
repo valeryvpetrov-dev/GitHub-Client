@@ -5,6 +5,7 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem as Doma
 
 fun DomainRepoItem.mapToPresentation(): RepoItem {
     return RepoItem(
+        this.id,
         this.fullName,
         this.description
     )
