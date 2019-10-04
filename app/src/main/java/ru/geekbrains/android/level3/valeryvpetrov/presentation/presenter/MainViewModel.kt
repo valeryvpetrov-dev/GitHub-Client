@@ -23,104 +23,109 @@ class MainViewModel(
     private val deleteUserUseCase: DeleteUserUseCase
 ) : ViewModel() {
 
-
-    private val _user = MutableLiveData<DomainUser>()
+    private val _user = MutableLiveData<DomainUser?>()
     val user: LiveData<PresentationUser?> = Transformations.map(_user) {
-        it.mapToPresentation()
+        it?.mapToPresentation()
     }
 
-    private val _loadError = MutableLiveData<Throwable>()
-    val loadError: LiveData<Throwable>
-        get() = _loadError
+    private val _getUserRemoteResult =
+        MutableLiveData<UseCaseResult<PresentationUser, Event<Throwable>>>()
+    val getUserRemoteResult: LiveData<UseCaseResult<PresentationUser, Event<Throwable>>> =
+        _getUserRemoteResult
 
-    private val _dataLoading = MutableLiveData<Boolean>()
-    val dataLoading: LiveData<Boolean>
-        get() = _dataLoading
+    private val _getUserLocalResult =
+        MutableLiveData<UseCaseResult<PresentationUser, Event<Throwable>>>()
+    val getUserLocalResult: LiveData<UseCaseResult<PresentationUser, Event<Throwable>>> =
+        _getUserLocalResult
 
-    private val _saveUserResult = MutableLiveData<Pair<Boolean?, Throwable?>>()
-    val saveUserResult: LiveData<Pair<Boolean?, Throwable?>>
+    private val _saveUserResult = MutableLiveData<UseCaseResult<Event<Boolean>, Event<Throwable>>>()
+    val saveUserResult: LiveData<UseCaseResult<Event<Boolean>, Event<Throwable>>>
         get() = _saveUserResult
 
-    private val _deleteUserResult = MutableLiveData<Pair<Boolean?, Throwable?>>()
-    val deleteUserResult: LiveData<Pair<Boolean?, Throwable?>>
+    private val _deleteUserResult =
+        MutableLiveData<UseCaseResult<Event<Boolean>, Event<Throwable>>>()
+    val deleteUserResult: LiveData<UseCaseResult<Event<Boolean>, Event<Throwable>>>
         get() = _deleteUserResult
 
     fun loadUserWithReposFromNetwork(username: String) {
         if (username.trim().isEmpty()) {
-            _loadError.value = Throwable("Pass valid username")
+            _getUserRemoteResult.value =
+                UseCaseResult.Error(Event(Throwable("Pass valid username")))
             return
         }
-
-        _dataLoading.value = true
-
+        _getUserRemoteResult.value = UseCaseResult.Loading()
         if (connectivityManager.isNetworkConnected()) {
-            getUserRemoteUseCase.execute(username, GetUserUseCaseSingleObserver())
+            getUserRemoteUseCase.execute(username, GetUserRemoteUseCaseSingleObserver())
         } else {
-            _dataLoading.value = false
-            _loadError.value = Throwable("No internet connection")
+            _getUserRemoteResult.value =
+                UseCaseResult.Error(Event(Throwable("No internet connection")))
         }
     }
 
     fun loadUserWithReposFromDb(username: String) {
         if (username.trim().isEmpty()) {
-            _loadError.value = Throwable("Pass valid username")
+            _getUserLocalResult.value =
+                UseCaseResult.Error(Event(Throwable("Pass valid username")))
             return
         }
-
-        _dataLoading.value = true
-        getUserLocalUseCase.execute(username, GetUserUseCaseSingleObserver())
+        _getUserLocalResult.value = UseCaseResult.Loading()
+        getUserLocalUseCase.execute(username, GetUserLocalUseCaseSingleObserver())
     }
 
-    fun saveUserWithReposToDb(user: PresentationUser?) {
-        if (user == null) return
-
-        _dataLoading.value = true
+    fun saveUserWithReposToDb(user: PresentationUser) {
+        _saveUserResult.value = UseCaseResult.Loading()
         saveUserUseCase.execute(user.mapToDomain(), SaveUserUseCaseSingleObserver())
     }
 
-    fun deleteUserWithReposFromDb(user: PresentationUser?) {
-        if (user == null) return
-
-        _dataLoading.value = true
+    fun deleteUserWithReposFromDb(user: PresentationUser) {
+        _deleteUserResult.value = UseCaseResult.Loading()
         deleteUserUseCase.execute(user.mapToDomain(), DeleteUserUseCaseSingleObserver())
     }
 
-    inner class GetUserUseCaseSingleObserver : DisposableSingleObserver<DomainUser>() {
+    inner class GetUserRemoteUseCaseSingleObserver : DisposableSingleObserver<DomainUser>() {
 
         override fun onSuccess(user: DomainUser) {
-            _dataLoading.value = false
             _user.value = user
+            _getUserRemoteResult.value = UseCaseResult.Success(user.mapToPresentation())
         }
 
         override fun onError(e: Throwable) {
-            _dataLoading.value = false
-            _loadError.value = e
+            _getUserRemoteResult.value = UseCaseResult.Error(Event(e))
+        }
+    }
+
+    inner class GetUserLocalUseCaseSingleObserver : DisposableSingleObserver<DomainUser>() {
+
+        override fun onSuccess(user: DomainUser) {
+            _user.value = user
+            _getUserLocalResult.value = UseCaseResult.Success(user.mapToPresentation())
+        }
+
+        override fun onError(e: Throwable) {
+            _getUserLocalResult.value = UseCaseResult.Error(Event(e))
         }
     }
 
     inner class SaveUserUseCaseSingleObserver : DisposableSingleObserver<Boolean>() {
 
         override fun onSuccess(result: Boolean) {
-            _dataLoading.value = false
-            _saveUserResult.value = result to null
+            _saveUserResult.value = UseCaseResult.Success(Event(result))
         }
 
         override fun onError(e: Throwable) {
-            _dataLoading.value = false
-            _saveUserResult.value = null to e
+            _saveUserResult.value = UseCaseResult.Error(Event(e))
         }
     }
 
     inner class DeleteUserUseCaseSingleObserver : DisposableSingleObserver<Boolean>() {
 
         override fun onSuccess(result: Boolean) {
-            _dataLoading.value = false
-            _deleteUserResult.value = result to null
+            _user.value = null
+            _deleteUserResult.value = UseCaseResult.Success(Event(result))
         }
 
         override fun onError(e: Throwable) {
-            _dataLoading.value = false
-            _deleteUserResult.value = null to e
+            _deleteUserResult.value = UseCaseResult.Error(Event(e))
         }
     }
 }
