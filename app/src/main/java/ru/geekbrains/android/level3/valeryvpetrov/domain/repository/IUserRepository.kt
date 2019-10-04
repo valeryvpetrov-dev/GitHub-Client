@@ -5,7 +5,7 @@ import io.reactivex.Single
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 
-interface UserRepository {
+interface IUserRepository {
 
     fun getUser(username: String): Single<User>
 

@@ -1,17 +1,17 @@
-package ru.geekbrains.android.level3.valeryvpetrov.data.remote.repository
+package ru.geekbrains.android.level3.valeryvpetrov.data.remote.datasource
 
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.Retrofit
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.github.UserApi
+import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
-import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
 
-class UserRemoteRepository(
+class UserRemoteDataSource(
     private val retrofitGithub: Retrofit
-) : DomainUserRepository {
+) : IUserDataSource {
 
     private val userApi: UserApi by lazy {
         retrofitGithub.create(UserApi::class.java)

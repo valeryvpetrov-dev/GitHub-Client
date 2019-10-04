@@ -1,19 +1,18 @@
-package ru.geekbrains.android.level3.valeryvpetrov.data.local.repository
+package ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.datasource
 
 import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.entity.mapper.mapToRealm
+import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
 import ru.geekbrains.android.level3.valeryvpetrov.util.measureTimeMillis
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.entity.User as RealmUser
-import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
 
-class UserLocalRepository(
-) : DomainUserRepository {
+class UserRealmDataSource() : IUserDataSource {
 
     companion object {
 

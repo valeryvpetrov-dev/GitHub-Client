@@ -3,8 +3,9 @@ package ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import retrofit2.Retrofit
-import ru.geekbrains.android.level3.valeryvpetrov.data.local.repository.UserLocalRepository
-import ru.geekbrains.android.level3.valeryvpetrov.data.remote.repository.UserRemoteRepository
+import ru.geekbrains.android.level3.valeryvpetrov.data.local.datasource.UserLocalDataSource
+import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.datasource.UserRealmDataSource
+import ru.geekbrains.android.level3.valeryvpetrov.data.remote.datasource.UserRemoteDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.UserRepository
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.DeleteUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
@@ -29,10 +30,12 @@ class ViewModelFactory(
             retrofitGithub: Retrofit
         ): ViewModelFactory {
             val userRemoteRepository =
-                UserRemoteRepository(
+                UserRemoteDataSource(
                     retrofitGithub
                 )
-            val userLocalRetrofit = UserLocalRepository()
+            val userLocalRetrofit = UserLocalDataSource(
+                UserRealmDataSource()
+            )
             val userRepository = UserRepository.getInstance(userRemoteRepository, userLocalRetrofit)
             val networkExecutionScheduler = appExecutors.networkIo
             val diskExecutionScheduler = appExecutors.diskIo

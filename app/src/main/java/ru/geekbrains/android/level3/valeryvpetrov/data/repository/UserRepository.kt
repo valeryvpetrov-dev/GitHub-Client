@@ -3,13 +3,14 @@ package ru.geekbrains.android.level3.valeryvpetrov.data.repository
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.functions.Function
+import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
-import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.UserRepository as DomainUserRepository
+import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.IUserRepository as DomainUserRepository
 
 class UserRepository(
-    private val userRemoteRepository: DomainUserRepository,
-    private val userLocalRepository: DomainUserRepository
+    private val userRemoteDataSource: IUserDataSource,
+    private val userLocalDataSource: IUserDataSource
 ) : DomainUserRepository {
 
     companion object {
@@ -17,8 +18,8 @@ class UserRepository(
         private var instance: UserRepository? = null
 
         fun getInstance(
-            userRemoteRepository: DomainUserRepository,
-            userLocalRepository: DomainUserRepository
+            userRemoteRepository: IUserDataSource,
+            userLocalRepository: IUserDataSource
         ) =
             instance
                 ?: UserRepository(
@@ -31,10 +32,10 @@ class UserRepository(
 
     override fun getUser(username: String): Single<User> {
         // first try to get from local repository
-        return userLocalRepository.getUser(username)
+        return userLocalDataSource.getUser(username)
             .onErrorResumeNext {
                 // if there is no required data redirect call to remote repository
-                userRemoteRepository.getUser(username)
+                userRemoteDataSource.getUser(username)
                     .doOnError {
                         Throwable("Problem with getting user")
                     }
@@ -57,10 +58,10 @@ class UserRepository(
 
     override fun getUserRepos(user: User): Single<List<RepoItem>?> {
         // first try to get from local repository
-        return userLocalRepository.getUserRepos(user)
+        return userLocalDataSource.getUserRepos(user)
             .onErrorResumeNext {
                 // if there is no required data redirect call to remote repository
-                userRemoteRepository.getUserRepos(user)
+                userRemoteDataSource.getUserRepos(user)
                     .doOnError {
                         Throwable("Problem with getting user repos")
                     }
@@ -68,10 +69,10 @@ class UserRepository(
     }
 
     override fun saveUser(user: User): Completable {
-        return userLocalRepository.saveUser(user)
+        return userLocalDataSource.saveUser(user)
     }
 
     override fun deleteUser(user: User): Completable {
-        return userLocalRepository.deleteUser(user)
+        return userLocalDataSource.deleteUser(user)
     }
 }
