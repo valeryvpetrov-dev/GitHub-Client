@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModel
 import io.reactivex.observers.DisposableSingleObserver
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.DeleteUserUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserLocalUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserRemoteUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.SaveUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.mapper.mapToPresentation
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
@@ -16,7 +17,8 @@ import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.User as Pr
 
 class MainViewModel(
     private val connectivityManager: ConnectivityManager,
-    private val getUserUseCase: GetUserUseCase,
+    private val getUserRemoteUseCase: GetUserRemoteUseCase,
+    private val getUserLocalUseCase: GetUserLocalUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase
 ) : ViewModel() {
@@ -52,7 +54,7 @@ class MainViewModel(
         _dataLoading.value = true
 
         if (connectivityManager.isNetworkConnected()) {
-            getUserUseCase.execute(username, GetUserUseCaseSingleObserver())
+            getUserRemoteUseCase.execute(username, GetUserUseCaseSingleObserver())
         } else {
             _dataLoading.value = false
             _loadError.value = Throwable("No internet connection")
@@ -66,7 +68,7 @@ class MainViewModel(
         }
 
         _dataLoading.value = true
-        getUserUseCase.execute(username, GetUserUseCaseSingleObserver())
+        getUserLocalUseCase.execute(username, GetUserUseCaseSingleObserver())
     }
 
     fun saveUserWithReposToDb(user: PresentationUser?) {

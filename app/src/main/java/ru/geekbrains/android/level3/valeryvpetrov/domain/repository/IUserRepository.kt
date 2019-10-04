@@ -7,7 +7,11 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 
 interface IUserRepository {
 
-    fun getUser(username: String): Single<User>
+    fun getUser(
+        username: String,
+        forceNetwork: Boolean = false,
+        forceDb: Boolean = false
+    ): Single<User>
 
     fun getUserRepos(user: User): Single<List<RepoItem>?>
 

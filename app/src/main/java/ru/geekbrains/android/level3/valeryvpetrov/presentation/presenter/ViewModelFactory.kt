@@ -8,14 +8,16 @@ import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.datasource.Us
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.datasource.UserRemoteDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.UserRepository
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.DeleteUserUseCase
-import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserLocalUseCase
+import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserRemoteUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.SaveUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.util.AppExecutors
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 
 class ViewModelFactory(
     private val connectivityManager: ConnectivityManager,
-    private val getUserUseCase: GetUserUseCase,
+    private val getUserRemoteUseCase: GetUserRemoteUseCase,
+    private val getUserLocalUseCase: GetUserLocalUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -44,7 +46,12 @@ class ViewModelFactory(
             if (instance == null) {
                 instance = ViewModelFactory(
                     connectivityManager,
-                    GetUserUseCase(
+                    GetUserRemoteUseCase(
+                        networkExecutionScheduler,
+                        mainThreadExecutionScheduler,
+                        userRepository
+                    ),
+                    GetUserLocalUseCase(
                         networkExecutionScheduler,
                         mainThreadExecutionScheduler,
                         userRepository
@@ -71,7 +78,8 @@ class ViewModelFactory(
                 isAssignableFrom(MainViewModel::class.java) ->
                     MainViewModel(
                         connectivityManager,
-                        getUserUseCase,
+                        getUserRemoteUseCase,
+                        getUserLocalUseCase,
                         saveUserUseCase,
                         deleteUserUseCase
                     )

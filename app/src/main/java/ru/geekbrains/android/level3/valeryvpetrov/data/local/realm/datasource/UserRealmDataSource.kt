@@ -99,8 +99,7 @@ class UserRealmDataSource() : IUserDataSource {
     }
 
     override fun deleteUser(user: User): Completable {
-
-        val completableRealm = Completable.fromAction {
+        val completableRealm = Completable.create { emitter ->
             val block: () -> Unit = {
                 val realmUser = user.mapToRealm()
 
@@ -111,6 +110,8 @@ class UserRealmDataSource() : IUserDataSource {
                         .equalTo("id", realmUser.id)
                         .findFirst()
                         ?.deleteFromRealm()
+                        ?: emitter.onError(Throwable("There is no user with login ${user.login} to delete"))
+                    emitter.onComplete()
                 }
             }
             measureTimeMillis(block, { time ->

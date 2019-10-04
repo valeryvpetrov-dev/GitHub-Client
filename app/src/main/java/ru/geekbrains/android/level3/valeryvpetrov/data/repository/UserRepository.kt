@@ -30,30 +30,26 @@ class UserRepository(
                 }
     }
 
-    override fun getUser(username: String): Single<User> {
-        // first try to get from local repository
-        return userLocalDataSource.getUser(username)
-            .onErrorResumeNext {
-                // if there is no required data redirect call to remote repository
-                userRemoteDataSource.getUser(username)
-                    .doOnError {
-                        Throwable("Problem with getting user")
-                    }
-                    .flatMap(Function<User, Single<User>> { user ->
-                        return@Function getUserRepos(user)
-                            .map {
-                                user.repoItems = it
-                                return@map user
+    override fun getUser(
+        username: String,
+        forceNetwork: Boolean,
+        forceDb: Boolean
+    ): Single<User> {
+        return when {
+            forceNetwork -> userRemoteDataSource.getUser(username)
+            forceDb -> userLocalDataSource.getUser(username)
+            else -> {
+                // first try to get from local repository
+                userLocalDataSource.getUser(username)
+                    .onErrorResumeNext {
+                        // if there is no required data redirect call to remote repository
+                        userRemoteDataSource.getUser(username)
+                            .doOnError {
+                                Throwable("Problem with getting user")
                             }
-                    })
-            }
-            .flatMap(Function<User, Single<User>> { user ->
-                return@Function getUserRepos(user)
-                    .map {
-                        user.repoItems = it
-                        return@map user
                     }
-            })
+            }
+        }
     }
 
     override fun getUserRepos(user: User): Single<List<RepoItem>?> {

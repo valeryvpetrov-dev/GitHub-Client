@@ -6,7 +6,7 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IExecutionSche
 import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IPostExecutionScheduler
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.IUserRepository
 
-class GetUserUseCase(
+class GetUserRemoteUseCase(
     executionScheduler: IExecutionScheduler,
     postExecutionScheduler: IPostExecutionScheduler,
     private val userRepository: IUserRepository
