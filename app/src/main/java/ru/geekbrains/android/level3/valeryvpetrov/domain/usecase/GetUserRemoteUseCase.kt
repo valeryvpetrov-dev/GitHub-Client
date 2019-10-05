@@ -16,6 +16,6 @@ class GetUserRemoteUseCase(
 ) {
 
     override fun buildSingle(requestValue: String): Single<User> {
-        return userRepository.getUser(requestValue)
+        return userRepository.getUser(requestValue, forceNetwork = true)
     }
 }
