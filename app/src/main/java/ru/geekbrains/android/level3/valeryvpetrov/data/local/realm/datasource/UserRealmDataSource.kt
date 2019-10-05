@@ -1,80 +1,73 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.datasource
 
-import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.entity.mapper.mapToRealm
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
+import ru.geekbrains.android.level3.valeryvpetrov.data.util.logcatInfo
+import ru.geekbrains.android.level3.valeryvpetrov.data.util.measureTimeInSeconds
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
-import ru.geekbrains.android.level3.valeryvpetrov.util.measureTimeMillis
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.entity.User as RealmUser
 
 class UserRealmDataSource() : IUserDataSource {
 
     companion object {
 
-        const val LOG_TAG_EXECUTION_TIME = "ExecutionTime"
-
-        const val LOG_MESSAGE_TEMPLATE_EXECUTION_TIME = "%-10s :: %-20s :: %.5f secs"
+        const val LOG_MESSAGE_NAMESPACE = "Realm"
     }
 
     override fun getUser(username: String): Single<User> {
-        return Single.create<User> {
-            val block: () -> User? = {
+        val block: () -> Single<User> = {
+            Single.create {
                 val realm = Realm.getDefaultInstance()
 
-                realm.where(RealmUser::class.java)
+                val user = realm.where(RealmUser::class.java)
                     .equalTo("login", username)
                     .findFirst()
                     ?.mapToDomain()
-            }
-            val user = measureTimeMillis(block, { time ->
-                Log.i(
-                    LOG_TAG_EXECUTION_TIME,
-                    LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Realm", "getUser", time)
-                )
-            })
 
-            if (user != null) {
-                it.onSuccess(user)
-            } else {
-                it.onError(Throwable("There is no user with login $username in Realm"))
+                if (user != null) {
+                    it.onSuccess(user)
+                } else {
+                    it.onError(Throwable("There is no user with login $username in Realm"))
+                }
             }
         }
+
+        val single =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "getUser", logcatInfo)
+        return single
     }
 
     override fun getUserRepos(user: User): Single<List<RepoItem>?> {
-        return Single.create<List<RepoItem>> {
-            val block: () -> List<RepoItem>? = {
+        val block: () -> Single<List<RepoItem>?> = {
+            Single.create {
                 val realm = Realm.getDefaultInstance()
 
-                realm.where(RealmUser::class.java)
+                val repoItems = realm.where(RealmUser::class.java)
                     .equalTo("login", user.login)
                     .findFirst()
                     ?.repoItems?.toList()
                     ?.map { items -> items.mapToDomain() }
-            }
-            val repoItems = measureTimeMillis(block, { time ->
-                Log.i(
-                    LOG_TAG_EXECUTION_TIME,
-                    LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Realm", "getUserRepos", time)
-                )
-            })
 
-            if (repoItems != null) {
-                it.onSuccess(repoItems)
-            } else {
-                it.onError(Throwable("There is no repos ${user.login} owns in Realm"))
+                if (repoItems != null) {
+                    it.onSuccess(repoItems)
+                } else {
+                    it.onError(Throwable("There is no repos ${user.login} owns in Realm"))
+                }
             }
         }
+        val single =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "getUserRepos", logcatInfo)
+        return single
     }
 
     override fun saveUser(user: User): Completable {
-        return Completable.fromAction {
-            val block: () -> Unit = {
+        val block: () -> Completable = {
+            Completable.fromAction {
                 val realmUser = user.mapToRealm()
 
                 val realm = Realm.getDefaultInstance()
@@ -83,18 +76,15 @@ class UserRealmDataSource() : IUserDataSource {
                     it.copyToRealmOrUpdate(realmUser)
                 }
             }
-            measureTimeMillis(block, { time ->
-                Log.i(
-                    LOG_TAG_EXECUTION_TIME,
-                    LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Realm", "saveUser", time)
-                )
-            })
         }
+        val completable =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "saveUser", logcatInfo)
+        return completable
     }
 
     override fun deleteUser(user: User): Completable {
-        return Completable.create { emitter ->
-            val block: () -> Unit = {
+        val block: () -> Completable = {
+            Completable.create { emitter ->
                 val realmUser = user.mapToRealm()
 
                 val realm = Realm.getDefaultInstance()
@@ -108,13 +98,9 @@ class UserRealmDataSource() : IUserDataSource {
                     emitter.onComplete()
                 }
             }
-            measureTimeMillis(block, { time ->
-                Log.i(
-                    LOG_TAG_EXECUTION_TIME,
-                    LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Realm", "deleteUser", time)
-                )
-            })
-
         }
+        val completable =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "deleteUser", logcatInfo)
+        return completable
     }
 }

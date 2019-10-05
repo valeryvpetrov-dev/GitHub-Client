@@ -1,8 +1,6 @@
 package ru.geekbrains.android.level3.valeryvpetrov.presentation.ui
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -135,18 +133,6 @@ class MainActivity : AppCompatActivity() {
     private fun hideLoadProgress() {
         binding.activityMainContent.loadProgress.visibility = View.INVISIBLE
         binding.activityMainContent.userRepoItemsRecycler.visibility = View.VISIBLE
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_show_logs -> TODO()
-        }
-        return super.onOptionsItemSelected(item)
     }
 }
 

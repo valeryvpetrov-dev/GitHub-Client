@@ -1,6 +1,5 @@
 package ru.geekbrains.android.level3.valeryvpetrov.data.local.room.datasource
 
-import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.functions.Function
@@ -8,10 +7,11 @@ import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.dao.RepoDao
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.dao.UserDao
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.entity.mapper.mapToRoom
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
+import ru.geekbrains.android.level3.valeryvpetrov.data.util.logcatInfo
+import ru.geekbrains.android.level3.valeryvpetrov.data.util.measureTimeInSeconds
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
-import ru.geekbrains.android.level3.valeryvpetrov.util.measureTimeMillis
 
 class UserRoomDataSource(
     private val userDao: UserDao,
@@ -20,9 +20,7 @@ class UserRoomDataSource(
 
     companion object {
 
-        const val LOG_TAG_EXECUTION_TIME = "ExecutionTime"
-
-        const val LOG_MESSAGE_TEMPLATE_EXECUTION_TIME = "%-10s :: %-20s :: %.5f secs"
+        const val LOG_MESSAGE_NAMESPACE = "Room"
     }
 
     override fun getUser(username: String): Single<User> {
@@ -43,12 +41,8 @@ class UserRoomDataSource(
                     Single.error(Throwable("There is no user with login $username in Room"))
                 }
         }
-        val single = measureTimeMillis(block, { time ->
-            Log.i(
-                LOG_TAG_EXECUTION_TIME,
-                LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Room", "getUser", time)
-            )
-        })
+        val single =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "getUser", logcatInfo)
         return single
     }
 
@@ -63,12 +57,8 @@ class UserRoomDataSource(
                     Single.error(Throwable("There is no repos ${user.login} owns in Room"))
                 }
         }
-        val single = measureTimeMillis(block, { time ->
-            Log.i(
-                LOG_TAG_EXECUTION_TIME,
-                LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Room", "getUserRepos", time)
-            )
-        })
+        val single =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "getUserRepos", logcatInfo)
         return single
     }
 
@@ -86,12 +76,8 @@ class UserRoomDataSource(
                         }
                 })
         }
-        val completable = measureTimeMillis(block, { time ->
-            Log.i(
-                LOG_TAG_EXECUTION_TIME,
-                LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Room", "saveUser", time)
-            )
-        })
+        val completable =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "saveUser", logcatInfo)
         return completable
     }
 
@@ -101,12 +87,8 @@ class UserRoomDataSource(
             userDao.delete(userRoom)
         }
 
-        val completable = measureTimeMillis(block, { time ->
-            Log.i(
-                LOG_TAG_EXECUTION_TIME,
-                LOG_MESSAGE_TEMPLATE_EXECUTION_TIME.format("Room", "deleteUser", time)
-            )
-        })
+        val completable =
+            measureTimeInSeconds(block, LOG_MESSAGE_NAMESPACE, "deleteUser", logcatInfo)
         return completable
     }
 }
