@@ -14,34 +14,38 @@ class UserLocalDataSource(
 ) : IUserDataSource {
 
     override fun getUser(username: String): Single<User> {
-        return userRoomDataSource.getUser(username)
-//        return Single.ambArray(
-//            userRealmDataSource.getUser(username),
-//            userRoomDataSource.getUser(username)
-//        )
+        return Single.ambArray(
+            userRealmDataSource.getUser(username),
+            userRoomDataSource.getUser(username)
+        ).onErrorResumeNext {
+            Single.error(Throwable("There is no user with login $username in database"))
+        }
     }
 
     override fun getUserRepos(user: User): Single<List<RepoItem>?> {
-        return userRoomDataSource.getUserRepos(user)
-//        return Single.ambArray(
-//            userRealmDataSource.getUserRepos(user),
-//            userRoomDataSource.getUserRepos(user)
-//        )
+        return Single.ambArray(
+            userRealmDataSource.getUserRepos(user),
+            userRoomDataSource.getUserRepos(user)
+        ).onErrorResumeNext {
+            Single.error(Throwable("There is no repos ${user.login} owns in database"))
+        }
     }
 
     override fun saveUser(user: User): Completable {
-        return userRoomDataSource.saveUser(user)
-//        return Completable.concatArray(
-//            userRealmDataSource.saveUser(user),
-//            userRoomDataSource.saveUser(user)
-//        )
+        return Completable.concatArray(
+            userRealmDataSource.saveUser(user),
+            userRoomDataSource.saveUser(user)
+        ).onErrorResumeNext {
+            Completable.error(Throwable("There is already exists user with login ${user.login} in database"))
+        }
     }
 
     override fun deleteUser(user: User): Completable {
-        return userRoomDataSource.deleteUser(user)
-//        return Completable.concatArray(
-//            userRealmDataSource.deleteUser(user),
-//            userRoomDataSource.deleteUser(user)
-//        )
+        return Completable.concatArray(
+            userRealmDataSource.deleteUser(user),
+            userRoomDataSource.deleteUser(user)
+        ).onErrorResumeNext {
+            Completable.error(Throwable("There is no user with login ${user.login} to delete"))
+        }
     }
 }
