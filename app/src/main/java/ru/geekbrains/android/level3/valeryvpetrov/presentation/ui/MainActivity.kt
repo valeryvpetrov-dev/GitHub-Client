@@ -39,7 +39,8 @@ class MainActivity : AppCompatActivity() {
             ViewModelFactory.getInstance(
                 ConnectivityManager(application),
                 (application as Application).appExecutors,
-                (application as Application).retrofitGithub
+                (application as Application).retrofitGithub,
+                (application as Application).roomGitHubDatabase
             )
         )
             .get(MainViewModel::class.java)

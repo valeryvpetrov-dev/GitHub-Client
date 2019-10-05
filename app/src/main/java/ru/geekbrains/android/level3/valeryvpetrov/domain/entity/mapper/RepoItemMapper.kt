@@ -1,6 +1,7 @@
 package ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper
 
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.entity.RepoItem as RealmRepoItem
+import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.entity.RepoItem as RoomRepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.github.entity.RepoItemResponse as RetrofitRepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem as DomainRepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.RepoItem as PresentationRepoItem
@@ -22,6 +23,14 @@ fun RetrofitRepoItem.mapToDomain(): DomainRepoItem {
 }
 
 fun RealmRepoItem.mapToDomain(): DomainRepoItem {
+    return DomainRepoItem(
+        this.id,
+        this.fullName,
+        this.description
+    )
+}
+
+fun RoomRepoItem.mapToDomain(): DomainRepoItem {
     return DomainRepoItem(
         this.id,
         this.fullName,

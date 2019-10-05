@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import retrofit2.Retrofit
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.datasource.UserLocalDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.data.local.realm.datasource.UserRealmDataSource
+import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.datasource.UserRoomDataSource
+import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.db.GitHubDatabase
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.datasource.UserRemoteDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.UserRepository
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.DeleteUserUseCase
@@ -29,14 +31,16 @@ class ViewModelFactory(
         fun getInstance(
             connectivityManager: ConnectivityManager,
             appExecutors: AppExecutors,
-            retrofitGithub: Retrofit
+            retrofitGithub: Retrofit,
+            roomGitHubDatabase: GitHubDatabase
         ): ViewModelFactory {
             val userRemoteRepository =
                 UserRemoteDataSource(
                     retrofitGithub
                 )
             val userLocalRetrofit = UserLocalDataSource(
-                UserRealmDataSource()
+                UserRealmDataSource(),
+                UserRoomDataSource(roomGitHubDatabase.userDao(), roomGitHubDatabase.repoDao())
             )
             val userRepository = UserRepository.getInstance(userRemoteRepository, userLocalRetrofit)
             val networkExecutionScheduler = appExecutors.networkIo

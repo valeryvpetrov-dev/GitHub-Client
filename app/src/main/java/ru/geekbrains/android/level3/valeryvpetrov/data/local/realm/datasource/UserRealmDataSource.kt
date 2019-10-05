@@ -22,7 +22,7 @@ class UserRealmDataSource() : IUserDataSource {
     }
 
     override fun getUser(username: String): Single<User> {
-        val singleRealm = Single.create<User> {
+        return Single.create<User> {
             val block: () -> User? = {
                 val realm = Realm.getDefaultInstance()
 
@@ -44,12 +44,10 @@ class UserRealmDataSource() : IUserDataSource {
                 it.onError(Throwable("There is no user with login $username in Realm"))
             }
         }
-
-        return Single.ambArray(singleRealm)
     }
 
     override fun getUserRepos(user: User): Single<List<RepoItem>?> {
-        val singleRealm = Single.create<List<RepoItem>> {
+        return Single.create<List<RepoItem>> {
             val block: () -> List<RepoItem>? = {
                 val realm = Realm.getDefaultInstance()
 
@@ -72,12 +70,10 @@ class UserRealmDataSource() : IUserDataSource {
                 it.onError(Throwable("There is no repos ${user.login} owns in Realm"))
             }
         }
-
-        return Single.ambArray(singleRealm)
     }
 
     override fun saveUser(user: User): Completable {
-        val completableRealm = Completable.fromAction {
+        return Completable.fromAction {
             val block: () -> Unit = {
                 val realmUser = user.mapToRealm()
 
@@ -94,12 +90,10 @@ class UserRealmDataSource() : IUserDataSource {
                 )
             })
         }
-
-        return Completable.concatArray(completableRealm)
     }
 
     override fun deleteUser(user: User): Completable {
-        val completableRealm = Completable.create { emitter ->
+        return Completable.create { emitter ->
             val block: () -> Unit = {
                 val realmUser = user.mapToRealm()
 
@@ -122,7 +116,5 @@ class UserRealmDataSource() : IUserDataSource {
             })
 
         }
-
-        return Completable.concatArray(completableRealm)
     }
 }
