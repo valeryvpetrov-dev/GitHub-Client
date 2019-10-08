@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
@@ -12,15 +13,19 @@ import kotlinx.android.synthetic.main.activity_main_content.*
 import ru.geekbrains.android.level3.valeryvpetrov.Application
 import ru.geekbrains.android.level3.valeryvpetrov.R
 import ru.geekbrains.android.level3.valeryvpetrov.databinding.ActivityMainBinding
+import ru.geekbrains.android.level3.valeryvpetrov.di.component.UserRepoItemsScreenComponent
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.Event
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.MainViewModel
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.UseCaseResult
-import ru.geekbrains.android.level3.valeryvpetrov.presentation.presenter.ViewModelFactory
-import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
 import ru.geekbrains.android.level3.valeryvpetrov.util.toast
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
+    var screenComponent: UserRepoItemsScreenComponent? = null
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
@@ -29,24 +34,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        screenComponent = (application as Application).addUserRepoItemsScreenComponent()
+        screenComponent?.inject(this)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
 
-        viewModel = ViewModelProviders.of(
-            this,
-            ViewModelFactory.getInstance(
-                ConnectivityManager(application),
-                (application as Application).appExecutors,
-                (application as Application).retrofitGithub,
-                (application as Application).roomGitHubDatabase
-            )
-        )
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(MainViewModel::class.java)
         binding.viewModel = viewModel
 
         configureActionBar()
         configureUserRepoItemsRecycler()
         setObservers()
+    }
+
+    override fun onDestroy() {
+        (application as Application).removeUserRepoItemsScreenComponent()
+        super.onDestroy()
     }
 
     private fun configureActionBar() {
