@@ -12,10 +12,12 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.GetUserRemoteUs
 import ru.geekbrains.android.level3.valeryvpetrov.domain.usecase.SaveUserUseCase
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.mapper.mapToPresentation
 import ru.geekbrains.android.level3.valeryvpetrov.util.ConnectivityManager
+import javax.inject.Inject
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User as DomainUser
 import ru.geekbrains.android.level3.valeryvpetrov.presentation.entity.User as PresentationUser
 
-class MainViewModel(
+class MainViewModel
+@Inject constructor(
     private val connectivityManager: ConnectivityManager,
     private val getUserRemoteUseCase: GetUserRemoteUseCase,
     private val getUserLocalUseCase: GetUserLocalUseCase,
