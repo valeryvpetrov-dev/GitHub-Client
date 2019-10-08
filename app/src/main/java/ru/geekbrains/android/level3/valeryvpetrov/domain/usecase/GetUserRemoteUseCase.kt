@@ -5,8 +5,10 @@ import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IExecutionScheduler
 import ru.geekbrains.android.level3.valeryvpetrov.domain.executor.IPostExecutionScheduler
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.IUserRepository
+import javax.inject.Inject
 
-class GetUserRemoteUseCase(
+class GetUserRemoteUseCase
+@Inject constructor(
     executionScheduler: IExecutionScheduler,
     postExecutionScheduler: IPostExecutionScheduler,
     private val userRepository: IUserRepository

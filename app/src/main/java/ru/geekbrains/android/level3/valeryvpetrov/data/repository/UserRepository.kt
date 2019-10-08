@@ -2,33 +2,17 @@ package ru.geekbrains.android.level3.valeryvpetrov.data.repository
 
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.functions.Function
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
+import javax.inject.Inject
 import ru.geekbrains.android.level3.valeryvpetrov.domain.repository.IUserRepository as DomainUserRepository
 
-class UserRepository(
+class UserRepository
+@Inject constructor(
     private val userRemoteDataSource: IUserDataSource,
     private val userLocalDataSource: IUserDataSource
 ) : DomainUserRepository {
-
-    companion object {
-
-        private var instance: UserRepository? = null
-
-        fun getInstance(
-            userRemoteRepository: IUserDataSource,
-            userLocalRepository: IUserDataSource
-        ) =
-            instance
-                ?: UserRepository(
-                    userRemoteRepository,
-                    userLocalRepository
-                ).apply {
-                    instance = this
-                }
-    }
 
     override fun getUser(
         username: String,

@@ -12,8 +12,10 @@ import ru.geekbrains.android.level3.valeryvpetrov.data.util.measureTimeInSeconds
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
+import javax.inject.Inject
 
-class UserRoomDataSource(
+class UserRoomDataSource
+@Inject constructor(
     private val userDao: UserDao,
     private val repoDao: RepoDao
 ) : IUserDataSource {

@@ -9,14 +9,12 @@ import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUs
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.mapper.mapToDomain
+import javax.inject.Inject
 
-class UserRemoteDataSource(
-    private val retrofitGithub: Retrofit
+class UserRemoteDataSource
+@Inject constructor(
+    private val userApi: UserApi
 ) : IUserDataSource {
-
-    private val userApi: UserApi by lazy {
-        retrofitGithub.create(UserApi::class.java)
-    }
 
     override fun getUser(username: String): Single<User> {
         return userApi.getUser(username)

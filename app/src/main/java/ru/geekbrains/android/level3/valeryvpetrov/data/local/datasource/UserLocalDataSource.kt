@@ -7,8 +7,10 @@ import ru.geekbrains.android.level3.valeryvpetrov.data.local.room.datasource.Use
 import ru.geekbrains.android.level3.valeryvpetrov.data.repository.datasource.IUserDataSource
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.RepoItem
 import ru.geekbrains.android.level3.valeryvpetrov.domain.entity.User
+import javax.inject.Inject
 
-class UserLocalDataSource(
+class UserLocalDataSource
+@Inject constructor(
     private val userRealmDataSource: UserRealmDataSource,
     private val userRoomDataSource: UserRoomDataSource
 ) : IUserDataSource {
