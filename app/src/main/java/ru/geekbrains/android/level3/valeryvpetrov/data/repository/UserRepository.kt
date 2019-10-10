@@ -20,6 +20,7 @@ class UserRepository
         forceDb: Boolean
     ): Single<User> {
         return when {
+            username.isEmpty() -> Single.error(Throwable("Empty username"))
             forceNetwork -> userRemoteDataSource.getUser(username)
             forceDb -> userLocalDataSource.getUser(username)
             else -> {
