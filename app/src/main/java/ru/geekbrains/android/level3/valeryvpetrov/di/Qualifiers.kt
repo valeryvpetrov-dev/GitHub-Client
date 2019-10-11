@@ -24,7 +24,7 @@ annotation class QualifierUserLocalDataSource
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class QualifierHttpLoggingInterceptor
+annotation class QualifierStethoNetworkInterceptor
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)

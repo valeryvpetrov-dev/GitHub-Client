@@ -1,5 +1,6 @@
 package ru.geekbrains.android.level3.valeryvpetrov
 
+import com.facebook.stetho.Stetho
 import io.realm.Realm
 import ru.geekbrains.android.level3.valeryvpetrov.di.component.*
 import ru.geekbrains.android.level3.valeryvpetrov.di.module.*
@@ -13,6 +14,8 @@ class Application : AndroidApplication() {
 
     override fun onCreate() {
         super.onCreate()
+
+        Stetho.initializeWithDefaults(this)
 
         applicationComponent = DaggerApplicationComponent.builder()
             .applicationModule(ApplicationModule(this))

@@ -1,15 +1,15 @@
 package ru.geekbrains.android.level3.valeryvpetrov.di.module
 
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.geekbrains.android.level3.valeryvpetrov.data.remote.github.UserApi
-import ru.geekbrains.android.level3.valeryvpetrov.di.QualifierHttpLoggingInterceptor
+import ru.geekbrains.android.level3.valeryvpetrov.di.QualifierStethoNetworkInterceptor
 import javax.inject.Singleton
 
 @Module
@@ -42,18 +42,18 @@ class RetrofitModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        @QualifierHttpLoggingInterceptor
-        loggingInterceptor: Interceptor
+        @QualifierStethoNetworkInterceptor
+        stethoNetworkInterceptor: Interceptor
     ): OkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            .addNetworkInterceptor(stethoNetworkInterceptor)
             .build()
 
     @Provides
-    @QualifierHttpLoggingInterceptor
+    @QualifierStethoNetworkInterceptor
     @Singleton
-    fun provideLoggingInterceptor(): Interceptor =
-        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideStethoNetworkInterceptor(): Interceptor =
+        StethoInterceptor()
 
     @Provides
     @Singleton
