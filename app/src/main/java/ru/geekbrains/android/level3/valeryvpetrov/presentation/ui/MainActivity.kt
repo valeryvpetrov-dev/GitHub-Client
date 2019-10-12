@@ -1,6 +1,9 @@
 package ru.geekbrains.android.level3.valeryvpetrov.presentation.ui
 
+import android.content.Context
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -22,6 +25,10 @@ import ru.geekbrains.android.level3.valeryvpetrov.util.toast
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        var leakReference: Context? = null
+    }
 
     var screenComponent: UserRepoItemsScreenComponent? = null
     @Inject
@@ -53,6 +60,20 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         (application as Application).removeUserRepoItemsScreenComponent()
         super.onDestroy()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_trigger_leak_memory) {
+            leakReference = applicationContext
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun configureActionBar() {

@@ -8,4 +8,5 @@
     <string name="save_db_button_text">Save to DB</string>
     <string name="delete_db_button_text">Delete from DB</string>
     <string name="action_show_logs_title">Show logs</string>
+    <string name="action_trigger_leak_memory">Leak memory</string>
 </resources>

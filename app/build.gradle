@@ -8,7 +8,19 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'realm-android'
 
+def keyStorePropertiesFile = rootProject.file("keystore.properties")
+def keyStoreProperties = new Properties()
+keyStoreProperties.load(new FileInputStream(keyStorePropertiesFile))
+
 android {
+    signingConfigs {
+        release {
+            storeFile file(keyStoreProperties['storeFilePath'])
+            storePassword keyStoreProperties['storePassword']
+            keyAlias = keyStoreProperties['keyAlias']
+            keyPassword keyStoreProperties['keyPassword']
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
@@ -18,11 +30,18 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resValue "bool", "allow_debug_features", "false"
     }
     buildTypes {
+        debug  {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            resValue "bool", "allow_debug_features", "true"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     dataBinding {
@@ -61,6 +80,8 @@ dependencies {
 
     implementation 'com.facebook.stetho:stetho:1.5.1'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-3'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.test:core:1.0.0'
