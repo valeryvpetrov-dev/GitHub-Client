@@ -8,6 +8,8 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'realm-android'
 
+apply plugin: 'io.fabric'
+
 def keyStorePropertiesFile = rootProject.file("keystore.properties")
 def keyStoreProperties = new Properties()
 keyStoreProperties.load(new FileInputStream(keyStorePropertiesFile))
@@ -31,10 +33,10 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "bool", "allow_debug_features", "false"
+        resValue "bool", "allow_release_features", "false"
     }
     buildTypes {
         debug  {
-            applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
             resValue "bool", "allow_debug_features", "true"
         }
@@ -42,6 +44,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            resValue "bool", "allow_release_features", "true"
         }
     }
     dataBinding {
@@ -83,9 +86,14 @@ dependencies {
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-3'
 
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.test:core:1.0.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

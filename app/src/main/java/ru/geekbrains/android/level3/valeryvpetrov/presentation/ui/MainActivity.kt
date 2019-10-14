@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.crashlytics.android.Crashlytics
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import ru.geekbrains.android.level3.valeryvpetrov.Application
@@ -72,6 +73,8 @@ class MainActivity : AppCompatActivity() {
             leakReference = applicationContext
             finish()
             return true
+        } else if (item.itemId == R.id.action_trigger_firebase_crashlytics) {
+            Crashlytics.getInstance().crash()
         }
         return super.onOptionsItemSelected(item)
     }

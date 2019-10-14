@@ -6,4 +6,10 @@
             android:title="@string/action_trigger_leak_memory"
             app:showAsAction="never"
             android:visible="@bool/allow_debug_features"/>
+
+    <item
+            android:id="@+id/action_trigger_firebase_crashlytics"
+            android:title="@string/action_trigger_firebase_crashlytics"
+            app:showAsAction="never"
+            android:visible="@bool/allow_release_features"/>
 </menu>
